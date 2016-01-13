@@ -1,0 +1,23 @@
+{
+    "name": "aciliainternet/dblogger-bundle",
+    "type": "bundle",
+    "description": "Acilia DataBase Logger Bundle",
+    "keywords": ["bundle"],
+    "homepage": "https://github.com/aciliainternet/DBLoggerBundle",
+    "authors": [
+        {
+            "name": "Acilia Internet",
+            "homepage": "http://acilia.es"
+        }
+    ],
+    "require": {
+        "php":                      ">=5.3.3",
+        "symfony/framework-bundle": ">=2.3.0",
+        "doctrine/doctrine-bundle": "^1.6",
+        "symfony/monolog-bundle": "^2.8"
+    },
+    "autoload": {
+        "psr-0": { "Acilia\\Bundle\\DBLoggerBundle": "" }
+    },
+    "target-dir": "Acilia/Bundle/DBLoggerBundle"
+}

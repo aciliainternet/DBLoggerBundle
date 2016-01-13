@@ -1,0 +1,7 @@
+parameters:
+
+services:
+    acilia.dblogger:
+        class: Acilia\Bundle\DBLoggerBundle\Service\DatabaseHandler
+        calls:
+            - [ setDoctrine, [ "@doctrine" ] ]
