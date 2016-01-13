@@ -1,3 +1,3 @@
-#BannerBundle
+#DBLoggerBundle
 
-Acilia Banner Bundle for Symfony2
+Acilia DBLogger Bundle for Symfony2
