@@ -32,14 +32,17 @@ class DatabaseHandler extends AbstractProcessingHandler
     protected function write(array $record)
     {
         if ($this->doctrine) {
-            $log = new Log();
-            $log->setChannel($record['channel'])
-                ->setMessage($record['message'])
-                ->setLevel($record['level_name'])
-                ->setDatetime($record['datetime']);
+            $connection = $this->doctrine->getManager()->getConnection();
 
-            $this->doctrine->getManager()->persist($log);
-            $this->doctrine->getManager()->flush($log);
+            $sql = 'INSERT INTO log (log_id, log_channel, log_message, log_level, log_datetime) VALUES (NULL, ?, ?, ?, ?)';
+            $stmt = $connection->prepare($sql);
+
+            $stmt->bindValue(1, $record['channel']);
+            $stmt->bindValue(2, $record['message']);
+            $stmt->bindValue(3, $record['level_name']);
+            $stmt->bindValue(4, $record['datetime']->format('Y-m-d H:i:s'));
+
+            $stmt->execute();
         }
     }
 }
