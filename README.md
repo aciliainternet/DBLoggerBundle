@@ -1,3 +1,3 @@
-#DBLoggerBundle
+# DBLoggerBundle
 
-Acilia DBLogger Bundle for Symfony2
+Acilia DBLogger Bundle for Symfony4
