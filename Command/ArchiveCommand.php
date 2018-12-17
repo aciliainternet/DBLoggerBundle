@@ -1,7 +1,7 @@
 <?php
 namespace Acilia\Bundle\DBLoggerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +12,7 @@ use Symfony\Component\Finder\Finder;
 use Exception;
 use DateTime;
 
-class ArchiveCommand extends ContainerAwareCommand
+class ArchiveCommand extends Command
 {
     const ARCHIVE_DAYS = 30;
 
