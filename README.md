@@ -1,5 +1,4 @@
 # DBLoggerBundle
-
 Acilia DBLogger Bundle for Symfony4
 
 * Require bundle
