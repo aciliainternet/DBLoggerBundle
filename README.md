@@ -18,8 +18,9 @@ monolog:
             id: acilia.dblogger
 ```
 * Paste the following on the services.yaml of the config folder:
-# dblogger archive command
+
 ```
+# dblogger archive command
 Acilia\Bundle\DBLoggerBundle\Command\ArchiveCommand:
     tags: ['console.command'] 
 ```
