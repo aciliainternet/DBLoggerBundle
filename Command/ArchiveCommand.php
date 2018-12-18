@@ -11,18 +11,27 @@ use Symfony\Component\Filesystem\LockHandler;
 use Symfony\Component\Finder\Finder;
 use Exception;
 use DateTime;
+use Doctrine\DBAL\Connection;
 
 class ArchiveCommand extends Command
 {
     const ARCHIVE_DAYS = 30;
+    protected static $defaultName = 'acilia:dblogger:archive';
+    private $connection;
+
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('acilia:dblogger:archive')
-            ->setDescription('Moves the log to it\'s archive')
+        $this->setDescription('Moves the log to it\'s archive')
             ->addOption(
                 'days',
                 'd',
@@ -61,19 +70,16 @@ class ArchiveCommand extends Command
             $now->setTime(0, 0, 0);
             $now->modify('-' . $days . ' days');
 
-            // Get connection
-            $connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
-
             // Archive logs
             $output->write('Archiving logs... ');
-            $stmt = $connection->prepare('INSERT INTO log_archive SELECT * FROM log WHERE log_datetime < ?');
+            $stmt = $this->connection->prepare('INSERT INTO log_archive SELECT * FROM log WHERE log_datetime < ?');
             $stmt->bindValue(1, $now->format('Y-m-d'));
             $stmt->execute();
             $output->writeln('OK');
 
             // Delete logs
             $output->write('Deleting logs... ');
-            $stmt = $connection->prepare('DELETE FROM log WHERE log_datetime < ?');
+            $stmt = $this->connection->prepare('DELETE FROM log WHERE log_datetime < ?');
             $stmt->bindValue(1, $now->format('Y-m-d'));
             $stmt->execute();
             $output->writeln('OK');
@@ -85,7 +91,7 @@ class ArchiveCommand extends Command
 
                 // Delete Archived logs
                 $output->write('Purge Archived logs... ');
-                $stmt = $connection->prepare('DELETE FROM log_archive WHERE log_datetime < ?');
+                $stmt = $this->connection->prepare('DELETE FROM log_archive WHERE log_datetime < ?');
                 $stmt->bindValue(1, $now->format('Y-m-d'));
                 $stmt->execute();
                 $output->writeln('OK');
