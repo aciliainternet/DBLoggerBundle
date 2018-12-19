@@ -52,7 +52,9 @@ class ArchiveCommand extends ContainerAwareCommand
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             }
         }
-        $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+        else {
+            $this->connection = $this->doctrine->getManager()->getConnection();
+        }
 
         return $this->connection;
     }
