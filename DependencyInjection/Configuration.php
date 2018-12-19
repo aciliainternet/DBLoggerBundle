@@ -18,11 +18,20 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('acilia_dblogger');
+        $rootNode = $treeBuilder->root('acilia_db_logger');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->arrayNode('pdo')
+                    ->children()
+                        ->scalarNode('user')->end()
+                        ->scalarNode('password')->end()
+                        ->scalarNode('url')->end()
+                    ->end()
+                ->end() // pdo
+            ->end()
+        ;
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        return $treeBuilder;
 
         return $treeBuilder;
     }
