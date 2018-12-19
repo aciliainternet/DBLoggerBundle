@@ -38,7 +38,7 @@ class DatabaseHandler extends AbstractProcessingHandler
         if ($this->getContainer()->hasParameter('acilia_db_logger')) {
             $config =  $this->getContainer()->getParameter('acilia_db_logger');
             if ($this->connection === null) {
-                if (isset($config['pdo']) and isset($config['pdo']['url']) and isset($config['pdo']['user']) and isset($config['pdo']['password'])) {
+                if (isset($config['pdo']) && isset($config['pdo']['url']) && isset($config['pdo']['user']) && isset($config['pdo']['password'])) {
                     $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                     $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
                 } else {
