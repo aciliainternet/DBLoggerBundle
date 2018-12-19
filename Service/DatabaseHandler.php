@@ -35,16 +35,22 @@ class DatabaseHandler extends AbstractProcessingHandler
      */
     private function getConnection()
     {
-        if ($this->getContainer()->hasParameter('acilia_db_logger')) {
-            $config =  $this->getContainer()->getParameter('acilia_db_logger');
-            if ($this->connection === null) {
+        $usePdo = false;
+        // Lógica para discriminar
+        if ($this->connection === null) {
+            if ($this->getContainer()->hasParameter('acilia_db_logger')) {
+                $config =  $this->getContainer()->getParameter('acilia_db_logger');
                 if (isset($config['pdo']) && isset($config['pdo']['url']) && isset($config['pdo']['user']) && isset($config['pdo']['password'])) {
-                    $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
-                    $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+                    $usePdo = true;
                 } else {
                     throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
                 }
             }
+        } 
+        
+        if ($usePdo) {
+            $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
+            $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
         } else {
             $this->connection = $this->doctrine->getManager()->getConnection();
         }
