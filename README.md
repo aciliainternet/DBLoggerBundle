@@ -6,7 +6,7 @@ Configuration for PDO
 ```
 acilia_db_logger:
     pdo:
-        user: root
-        password: root
-        url: mysql:host=symfony-dbserver;dbname=symfony
+        user: user
+        password: password
+        url: mysql:host=127.0.0.1;dbname=dbname
 ```
