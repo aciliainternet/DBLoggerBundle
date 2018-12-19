@@ -47,8 +47,8 @@ class ArchiveCommand extends ContainerAwareCommand
     {
         if ($this->getContainer()->getParameter('acilia_dblogger')) {
             $config =  $this->getContainer()->getParameter('acilia_dblogger');
-            $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
             if ($this->connection = null) {
+                $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             }
         } else {

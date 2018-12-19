@@ -37,12 +37,13 @@ class DatabaseHandler extends AbstractProcessingHandler
     {
         if ($this->getContainer()->getParameter('acilia_dblogger')) {
             $config =  $this->getContainer()->getParameter('acilia_dblogger');
-            $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
             if ($this->connection = null) {
+                $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             }
+        } else {
+            $this->connection = $this->doctrine->getManager()->getConnection();
         }
-        $this->connection = $this->doctrine->getManager()->getConnection();
 
         return $this->connection;
     }
