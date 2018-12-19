@@ -51,8 +51,7 @@ class ArchiveCommand extends ContainerAwareCommand
             if ($this->connection = null) {
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             }
-        }
-        else {
+        } else {
             $this->connection = $this->doctrine->getManager()->getConnection();
         }
 
