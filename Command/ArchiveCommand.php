@@ -15,6 +15,7 @@ use DateTime;
 class ArchiveCommand extends ContainerAwareCommand
 {
     const ARCHIVE_DAYS = 30;
+    private $connection = null;
 
     /**
      * {@inheritdoc}
@@ -40,6 +41,23 @@ class ArchiveCommand extends ContainerAwareCommand
     }
 
     /**
+     * If pdo data is set we use it, if not doctrine is.
+     */
+    private function getConnection()
+    {
+        if ($this->getContainer()->getParameter('acilia_dblogger')) {
+            $config =  $this->getContainer()->getParameter('acilia_dblogger');
+            $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
+            if ($this->connection = null) {
+                $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+            }
+        }
+        $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+
+        return $this->connection;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -62,7 +80,7 @@ class ArchiveCommand extends ContainerAwareCommand
             $now->modify('-' . $days . ' days');
 
             // Get connection
-            $connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+            $connection = $this->getConnection();
 
             // Archive logs
             $output->write('Archiving logs... ');

@@ -18,6 +18,7 @@ use Monolog\Logger;
 class DatabaseHandler extends AbstractProcessingHandler
 {
     protected $doctrine;
+    protected $connection;
 
     public function __construct($level = Logger::DEBUG, $bubble = true)
     {
@@ -29,10 +30,26 @@ class DatabaseHandler extends AbstractProcessingHandler
         $this->doctrine = $doctrine;
     }
 
+    /**
+     * If pdo data is set we use it, if not doctrine is.
+     */
+    private function getConnection()
+    {
+        if ($this->getContainer()->getParameter('acilia_dblogger')) {
+            $config =  $this->getContainer()->getParameter('acilia_dblogger');
+            $options = array(\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
+            if ($this->connection = null) {
+                $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+            }
+        }
+        $this->connection = $this->doctrine->getManager()->getConnection();
+
+        return $this->connection;
+    }
+
     protected function write(array $record)
     {
-        if ($this->doctrine) {
-            $connection = $this->doctrine->getManager()->getConnection();
+        if ($connection = $this->getConnection()) {
 
             $sql = 'INSERT INTO log (log_id, log_channel, log_message, log_level, log_datetime) VALUES (NULL, ?, ?, ?, ?)';
             $stmt = $connection->prepare($sql);
