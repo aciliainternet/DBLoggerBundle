@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('acilia_db_logger');
-        $treeBuilder->getRootNode()
+        $rootNode
             ->children()
                 ->arrayNode('pdo')
                     ->children()
@@ -30,8 +30,6 @@ class Configuration implements ConfigurationInterface
                 ->end() // pdo
             ->end()
         ;
-
-        return $treeBuilder;
 
         return $treeBuilder;
     }
