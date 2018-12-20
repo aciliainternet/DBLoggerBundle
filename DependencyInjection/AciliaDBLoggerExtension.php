@@ -21,9 +21,13 @@ class AciliaDBLoggerExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        
-        $container->setParameter('acilia_db_logger', $configs);
 
+        $parameters = [];
+        foreach ($configs as $row) {
+            $parameters = array_replace_recursive($parameters, $row);
+        }
+        $container->setParameter('acilia_db_logger', $parameters);
+        
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

@@ -59,6 +59,7 @@ class ArchiveCommand extends ContainerAwareCommand
             }
         
             if ($usePdo) {
+                $config =  $this->getContainer()->getParameter('acilia_db_logger');
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             } else {

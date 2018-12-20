@@ -47,7 +47,7 @@ class DatabaseHandler extends AbstractProcessingHandler
                 if (!isset($this->config['pdo']['url']) || 
                     !isset($this->config['pdo']['user']) || 
                     !isset($this->config['pdo']['password'])) {
-                    throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                    throw new \Exception('pdo configuration missing or not completed, (url, user and password must be set).');
                 } else {
                     $usePdo = true;
                 }
