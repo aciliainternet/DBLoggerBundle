@@ -52,7 +52,7 @@ class DatabaseHandler extends AbstractProcessingHandler
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             } else {
-                $this->connection = $this->doctrine->getManager()->getConnection();
+                $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
             }
         } 
         return $this->connection;
