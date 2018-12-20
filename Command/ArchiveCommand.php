@@ -31,8 +31,7 @@ class ArchiveCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('acilia:dblogger:archive')
-            ->setDescription('Moves the log to it\'s archive')
+        $this->setDescription('Moves the log to it\'s archive')
             ->addOption(
                 'days',
                 'd',
