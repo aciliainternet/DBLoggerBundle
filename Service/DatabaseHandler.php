@@ -46,15 +46,14 @@ class DatabaseHandler extends AbstractProcessingHandler
                     throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
                 }
             }
-        } 
         
-        if ($usePdo) {
-            $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
-            $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
-        } else {
-            $this->connection = $this->doctrine->getManager()->getConnection();
-        }
-
+            if ($usePdo) {
+                $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
+                $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+            } else {
+                $this->connection = $this->doctrine->getManager()->getConnection();
+            }
+        } 
         return $this->connection;
     }
 
