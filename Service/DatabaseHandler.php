@@ -19,6 +19,7 @@ class DatabaseHandler extends AbstractProcessingHandler
 {
     protected $doctrine;
     protected $connection;
+    protected $config;
 
     public function __construct($level = Logger::DEBUG, $bubble = true)
     {
@@ -30,31 +31,36 @@ class DatabaseHandler extends AbstractProcessingHandler
         $this->doctrine = $doctrine;
     }
 
+    public function setConfig($config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * If pdo data is set we use it, if not doctrine is.
      */
     private function getConnection()
     {
-        // Lógica para discriminar
         if ($this->connection === null) {
             $usePdo = false;
-            
-            if ($this->getContainer()->hasParameter('acilia_db_logger')) {
-                $config =  $this->getContainer()->getParameter('acilia_db_logger');
-                if (isset($config['pdo']) && isset($config['pdo']['url']) && isset($config['pdo']['user']) && isset($config['pdo']['password'])) {
-                    $usePdo = true;
-                } else {
+            if (isset($this->config['pdo']) {
+                if (!isset($this->config['pdo']['url']) || 
+                    !isset($this->config['pdo']['user']) || 
+                    !isset($this->config['pdo']['password'])) {
                     throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                } else {
+                    $usePdo = true;
                 }
             }
         
             if ($usePdo) {
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
-                $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+                $this->connection = new \PDO($this->config['pdo']['url'], $this->config['pdo']['user'], $this->config['pdo']['password'], $options);
             } else {
                 $this->connection = $this->doctrine->getManager()->getConnection();
             }
         } 
+
         return $this->connection;
     }
 

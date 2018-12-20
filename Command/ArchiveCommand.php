@@ -49,10 +49,12 @@ class ArchiveCommand extends ContainerAwareCommand
             $usePdo = false;
             if ($this->getContainer()->hasParameter('acilia_db_logger')) {
                 $config =  $this->getContainer()->getParameter('acilia_db_logger');
-                if (isset($config['pdo']) && isset($config['pdo']['url']) && isset($config['pdo']['user']) && isset($config['pdo']['password'])) {
-                    $usePdo = true;
-                } else {
-                    throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                if (isset($config['pdo']) {
+                    if (!isset($config['pdo']['url']) || !isset($config['pdo']['user']) || !isset($config['pdo']['password'])) {
+                        throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                    } else {
+                        $usePdo = true;
+                    }
                 }
             }
         
@@ -61,9 +63,9 @@ class ArchiveCommand extends ContainerAwareCommand
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             } else {
                 $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
-                
             }
         } 
+
         return $this->connection;
     }
 
