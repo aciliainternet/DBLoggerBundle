@@ -15,6 +15,7 @@ use DateTime;
 class ArchiveCommand extends ContainerAwareCommand
 {
     const ARCHIVE_DAYS = 30;
+    private $connection = null;
 
     /**
      * {@inheritdoc}
@@ -40,6 +41,36 @@ class ArchiveCommand extends ContainerAwareCommand
     }
 
     /**
+     * If pdo data is set we use it, if not doctrine is.
+     */
+    private function getConnection()
+    {
+        if ($this->connection === null) {
+            $usePdo = false;
+            if ($this->getContainer()->hasParameter('acilia_db_logger')) {
+                $config =  $this->getContainer()->getParameter('acilia_db_logger');
+                if (isset($config['pdo'])) {
+                    if (!isset($config['pdo']['url']) || !isset($config['pdo']['user']) || !isset($config['pdo']['password'])) {
+                        throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                    } else {
+                        $usePdo = true;
+                    }
+                }
+            }
+        
+            if ($usePdo) {
+                $config =  $this->getContainer()->getParameter('acilia_db_logger');
+                $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
+                $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+            } else {
+                $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+            }
+        } 
+
+        return $this->connection;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -62,7 +93,7 @@ class ArchiveCommand extends ContainerAwareCommand
             $now->modify('-' . $days . ' days');
 
             // Get connection
-            $connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+            $connection = $this->getConnection();
 
             // Archive logs
             $output->write('Archiving logs... ');

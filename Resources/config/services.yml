@@ -5,3 +5,4 @@ services:
         class: Acilia\Bundle\DBLoggerBundle\Service\DatabaseHandler
         calls:
             - [ setDoctrine, [ "@doctrine" ] ]
+            - [ setConfig, [ "%acilia_db_logger%" ] ]     
