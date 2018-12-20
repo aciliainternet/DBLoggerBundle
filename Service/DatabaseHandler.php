@@ -35,9 +35,10 @@ class DatabaseHandler extends AbstractProcessingHandler
      */
     private function getConnection()
     {
-        $usePdo = false;
         // Lógica para discriminar
         if ($this->connection === null) {
+            $usePdo = false;
+            
             if ($this->getContainer()->hasParameter('acilia_db_logger')) {
                 $config =  $this->getContainer()->getParameter('acilia_db_logger');
                 if (isset($config['pdo']) && isset($config['pdo']['url']) && isset($config['pdo']['user']) && isset($config['pdo']['password'])) {
