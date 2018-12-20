@@ -5,4 +5,9 @@ services:
         class: Acilia\Bundle\DBLoggerBundle\Service\DatabaseHandler
         calls:
             - [ setDoctrine, [ "@doctrine" ] ]
-            - [ setConfig, [ "%acilia_db_logger%" ] ]
+            - [ setConfig, [ "%acilia_db_logger%" ] ]     
+    acilia.dblogger.archivecommand:
+        class: Acilia\Bundle\DBLoggerBundle\Command\ArchiveCommand
+        arguments: [ '%acilia_db_logger%' ]
+        tags:
+            - { name: 'console.command' }

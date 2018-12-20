@@ -1,7 +1,7 @@
 <?php
 namespace Acilia\Bundle\DBLoggerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,11 +11,20 @@ use Symfony\Component\Filesystem\LockHandler;
 use Symfony\Component\Finder\Finder;
 use Exception;
 use DateTime;
+use Doctrine\DBAL\Connection;
 
-class ArchiveCommand extends ContainerAwareCommand
+class ArchiveCommand extends Command
 {
     const ARCHIVE_DAYS = 30;
+    protected static $defaultName = 'acilia:dblogger:archive';
     private $connection = null;
+    private $config;
+
+    public function __construct($config = null)
+    {
+        $this->config = $config;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -47,21 +56,17 @@ class ArchiveCommand extends ContainerAwareCommand
     {
         if ($this->connection === null) {
             $usePdo = false;
-            if ($this->getContainer()->hasParameter('acilia_db_logger')) {
-                $config =  $this->getContainer()->getParameter('acilia_db_logger');
-                if (isset($config['pdo'])) {
-                    if (!isset($config['pdo']['url']) || !isset($config['pdo']['user']) || !isset($config['pdo']['password'])) {
-                        throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
-                    } else {
-                        $usePdo = true;
-                    }
+            if (isset($this->config['pdo'])) {
+                if (!isset($this->config['pdo']['url']) || !isset($this->config['pdo']['user']) || !isset($this->config['pdo']['password'])) {
+                    throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                } else {
+                    $usePdo = true;
                 }
             }
         
             if ($usePdo) {
-                $config =  $this->getContainer()->getParameter('acilia_db_logger');
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
-                $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
+                $this->connection = new \PDO($this->config['pdo']['url'], $this->config['pdo']['user'], $this->config['pdo']['password'], $options);
             } else {
                 $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
             }
