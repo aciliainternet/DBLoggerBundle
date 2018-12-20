@@ -43,7 +43,7 @@ class DatabaseHandler extends AbstractProcessingHandler
     {
         if ($this->connection === null) {
             $usePdo = false;
-            if (isset($this->config['pdo']) {
+            if (isset($this->config['pdo'])) {
                 if (!isset($this->config['pdo']['url']) || 
                     !isset($this->config['pdo']['user']) || 
                     !isset($this->config['pdo']['password'])) {
