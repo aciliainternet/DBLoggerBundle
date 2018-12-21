@@ -19,11 +19,17 @@ class ArchiveCommand extends Command
     protected static $defaultName = 'acilia:dblogger:archive';
     private $connection = null;
     private $config;
+    private $doctrine;
 
     public function __construct($config = null)
     {
         $this->config = $config;
         parent::__construct();
+    }
+
+    public function setDoctrine($doctrine)
+    {
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -67,7 +73,7 @@ class ArchiveCommand extends Command
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                 $this->connection = new \PDO($this->config['pdo']['url'], $this->config['pdo']['user'], $this->config['pdo']['password'], $options);
             } else {
-                $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+                $this->connection = $this->doctrine->getManager()->getConnection();
             }
         } 
 
