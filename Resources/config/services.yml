@@ -6,11 +6,3 @@ services:
         calls:
             - [ setDoctrine, [ "@doctrine" ] ]
             - [ setConfig, [ "%acilia_db_logger%" ] ]
-
-    acilia.dblogger.archive:
-        class: Acilia\Bundle\DBLoggerBundle\Command\ArchiveCommand
-        arguments: [ '%acilia_db_logger%' ]
-        tags:
-            - { name: 'console.command' }
-        calls:
-            - [ setDoctrine, [ "@doctrine" ] ]

@@ -11,6 +11,7 @@ use Symfony\Component\Filesystem\LockHandler;
 use Symfony\Component\Finder\Finder;
 use Exception;
 use DateTime;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Doctrine\DBAL\Connection;
 
 class ArchiveCommand extends Command
@@ -19,17 +20,14 @@ class ArchiveCommand extends Command
     protected static $defaultName = 'acilia:dblogger:archive';
     private $connection = null;
     private $config;
-    private $doctrine;
+    private $doctrineConnection;
 
-    public function __construct($config = null)
+    public function __construct(ParameterBagInterface $params, Connection $connection)
     {
-        $this->config = $config;
+        $this->doctrineConnection = $connection;
+        $this->config = $params->get('acilia_db_logger');
+
         parent::__construct();
-    }
-
-    public function setDoctrine($doctrine)
-    {
-        $this->doctrine = $doctrine;
     }
 
     /**
@@ -73,10 +71,9 @@ class ArchiveCommand extends Command
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                 $this->connection = new \PDO($this->config['pdo']['url'], $this->config['pdo']['user'], $this->config['pdo']['password'], $options);
             } else {
-                $this->connection = $this->doctrine->getManager()->getConnection();
+                $this->connection = $this->doctrineConnection;
             }
-        } 
-
+        }
         return $this->connection;
     }
 
