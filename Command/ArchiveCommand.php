@@ -22,7 +22,7 @@ class ArchiveCommand extends Command
     private $config;
     private $doctrineConnection;
 
-    public function __construct(ParameterBagInterface $params, Connection $connection)
+    public function __construct(Connection $connection, ParameterBagInterface $params)
     {
         $this->doctrineConnection = $connection;
         $this->config = $params->get('acilia_db_logger');
