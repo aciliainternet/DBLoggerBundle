@@ -39,7 +39,7 @@ class ArchiveCommand extends Command
             ->addOption(
                 'days',
                 'd',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 sprintf('Number of days to preserve, default %s days', self::ARCHIVE_DAYS),
                 self::ARCHIVE_DAYS
             )
