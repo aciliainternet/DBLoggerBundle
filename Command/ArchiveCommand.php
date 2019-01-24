@@ -11,17 +11,21 @@ use Symfony\Component\Filesystem\LockHandler;
 use Symfony\Component\Finder\Finder;
 use Exception;
 use DateTime;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Doctrine\DBAL\Connection;
 
 class ArchiveCommand extends Command
 {
     const ARCHIVE_DAYS = 30;
     protected static $defaultName = 'acilia:dblogger:archive';
-    private $connection;
+    private $connection = null;
+    private $config;
+    private $doctrineConnection;
 
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, ParameterBagInterface $params)
     {
-        $this->connection = $connection;
+        $this->doctrineConnection = $connection;
+        $this->config = $params->get('acilia_db_logger');
 
         parent::__construct();
     }
@@ -35,7 +39,7 @@ class ArchiveCommand extends Command
             ->addOption(
                 'days',
                 'd',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 sprintf('Number of days to preserve, default %s days', self::ARCHIVE_DAYS),
                 self::ARCHIVE_DAYS
             )
@@ -46,6 +50,31 @@ class ArchiveCommand extends Command
                 'Number of days to preserve on the archive, purge older, default none'
             )
         ;
+    }
+
+    /**
+     * If pdo data is set we use it, if not doctrine is.
+     */
+    private function getConnection()
+    {
+        if ($this->connection === null) {
+            $usePdo = false;
+            if (isset($this->config['pdo'])) {
+                if (!isset($this->config['pdo']['url']) || !isset($this->config['pdo']['user']) || !isset($this->config['pdo']['password'])) {
+                    throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                } else {
+                    $usePdo = true;
+                }
+            }
+        
+            if ($usePdo) {
+                $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
+                $this->connection = new \PDO($this->config['pdo']['url'], $this->config['pdo']['user'], $this->config['pdo']['password'], $options);
+            } else {
+                $this->connection = $this->doctrineConnection;
+            }
+        }
+        return $this->connection;
     }
 
     /**
@@ -70,16 +99,19 @@ class ArchiveCommand extends Command
             $now->setTime(0, 0, 0);
             $now->modify('-' . $days . ' days');
 
+            // Get connection
+            $connection = $this->getConnection();
+
             // Archive logs
             $output->write('Archiving logs... ');
-            $stmt = $this->connection->prepare('INSERT INTO log_archive SELECT * FROM log WHERE log_datetime < ?');
+            $stmt = $connection->prepare('INSERT INTO log_archive SELECT * FROM log WHERE log_datetime < ?');
             $stmt->bindValue(1, $now->format('Y-m-d'));
             $stmt->execute();
             $output->writeln('OK');
 
             // Delete logs
             $output->write('Deleting logs... ');
-            $stmt = $this->connection->prepare('DELETE FROM log WHERE log_datetime < ?');
+            $stmt = $connection->prepare('DELETE FROM log WHERE log_datetime < ?');
             $stmt->bindValue(1, $now->format('Y-m-d'));
             $stmt->execute();
             $output->writeln('OK');
@@ -91,7 +123,7 @@ class ArchiveCommand extends Command
 
                 // Delete Archived logs
                 $output->write('Purge Archived logs... ');
-                $stmt = $this->connection->prepare('DELETE FROM log_archive WHERE log_datetime < ?');
+                $stmt = $connection->prepare('DELETE FROM log_archive WHERE log_datetime < ?');
                 $stmt->bindValue(1, $now->format('Y-m-d'));
                 $stmt->execute();
                 $output->writeln('OK');
