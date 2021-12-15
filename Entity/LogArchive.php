@@ -11,7 +11,6 @@
 
 namespace Acilia\Bundle\DBLoggerBundle\Entity;
 
-use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,140 +26,81 @@ use Doctrine\ORM\Mapping as ORM;
 class LogArchive
 {
     /**
-     * @var integer
-     *
      * @ORM\Column(name="log_id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
+    private int $id;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="log_channel", type="string", length=255, nullable=true)
      */
-    private $channel;
+    private string $channel;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="log_level", type="string", length=255, nullable=true)
      */
-    private $level;
+    private string $level;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="log_message", type="text", nullable=true)
      */
-    private $message;
+    private string $message;
 
     /**
-     * @var \DateTime
-     *
      * @ORM\Column(name="log_datetime", type="datetime", nullable=false)
      */
-    private $datetime;
+    private \DateTimeInterface $datetime;
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * Set channel
-     *
-     * @param  string $channel
-     * @return Log
-     */
-    public function setChannel($channel)
+    public function setChannel(string $channel): self
     {
         $this->channel = $channel;
 
         return $this;
     }
 
-    /**
-     * Get channel
-     *
-     * @return string
-     */
-    public function getChannel()
+    public function getChannel(): string
     {
         return $this->channel;
     }
 
-    /**
-     * Set level
-     *
-     * @param  string $level
-     * @return Log
-     */
-    public function setLevel($level)
+    public function setLevel(string $level): self
     {
         $this->level = $level;
 
         return $this;
     }
 
-    /**
-     * Get level
-     *
-     * @return string
-     */
-    public function getLevel()
+    public function getLevel(): string
     {
         return $this->level;
     }
 
-    /**
-     * Set message
-     *
-     * @param  string $message
-     * @return Log
-     */
-    public function setMessage($message)
+    public function setMessage(string $message): self
     {
         $this->message = $message;
 
         return $this;
     }
 
-    /**
-     * Get message
-     *
-     * @return string
-     */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * Set datetime
-     *
-     * @param  \DateTime $datetime
-     * @return Log
-     */
-    public function setDatetime(DateTime $datetime)
+    public function setDatetime(\DateTimeInterface $datetime): self
     {
         $this->datetime = $datetime;
 
         return $this;
     }
 
-    /**
-     * Get datetime
-     *
-     * @return DateTime
-     */
-    public function getDatetime()
+    public function getDatetime(): \DateTimeInterface
     {
         return $this->datetime;
     }

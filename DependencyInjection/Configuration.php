@@ -17,9 +17,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('acilia_db_logger');
-        $rootNode
+        $treeBuilder = new TreeBuilder('acilia_db_logger');
+        $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('pdo')
                     ->children()

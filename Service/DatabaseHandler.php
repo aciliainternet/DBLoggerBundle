@@ -11,7 +11,6 @@
 
 namespace Acilia\Bundle\DBLoggerBundle\Service;
 
-use Acilia\Bundle\DBLoggerBundle\Entity\Log;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 
@@ -39,32 +38,32 @@ class DatabaseHandler extends AbstractProcessingHandler
     /**
      * If pdo data is set we use it, if not doctrine is.
      */
-    private function getConnection()
+    private function getConnection(): \PDO
     {
         if ($this->connection === null) {
             $usePdo = false;
             if (isset($this->config['pdo'])) {
-                if (!isset($this->config['pdo']['url']) || 
-                    !isset($this->config['pdo']['user']) || 
+                if (!isset($this->config['pdo']['url']) ||
+                    !isset($this->config['pdo']['user']) ||
                     !isset($this->config['pdo']['password'])) {
                     throw new \Exception('pdo configuration missing or not completed, (url, user and password must be set).');
                 } else {
                     $usePdo = true;
                 }
             }
-        
+
             if ($usePdo) {
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                 $this->connection = new \PDO($this->config['pdo']['url'], $this->config['pdo']['user'], $this->config['pdo']['password'], $options);
             } else {
                 $this->connection = $this->doctrine->getManager()->getConnection();
             }
-        } 
+        }
 
         return $this->connection;
     }
 
-    protected function write(array $record)
+    protected function write(array $record): void
     {
         if ($connection = $this->getConnection()) {
 

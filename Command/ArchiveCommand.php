@@ -1,28 +1,34 @@
 <?php
 namespace Acilia\Bundle\DBLoggerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\LockHandler;
-use Symfony\Component\Finder\Finder;
-use Exception;
-use DateTime;
+use Symfony\Component\Console\Command\Command;
+use Doctrine\ORM\EntityManagerInterface;
 
-class ArchiveCommand extends ContainerAwareCommand
+class ArchiveCommand extends Command
 {
-    const ARCHIVE_DAYS = 30;
-    private $connection = null;
+    protected static $defaultName = 'acilia:dblogger:archive';
+
+    public const ARCHIVE_DAYS = 30;
+
+    protected \PDO $connection = null;
+    protected EntityManagerInterface $em;
+    protected ParameterBagInterface $params;
+
+    public function __construct(EntityManagerInterface $em, ParameterBagInterface $params)
+    {
+        $this->em = $em;
+        $this->params = $params;
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName('acilia:dblogger:archive')
+        $this
             ->setDescription('Moves the log to it\'s archive')
             ->addOption(
                 'days',
@@ -43,29 +49,29 @@ class ArchiveCommand extends ContainerAwareCommand
     /**
      * If pdo data is set we use it, if not doctrine is.
      */
-    private function getConnection()
+    private function getConnection(): \PDO
     {
         if ($this->connection === null) {
             $usePdo = false;
-            if ($this->getContainer()->hasParameter('acilia_db_logger')) {
-                $config =  $this->getContainer()->getParameter('acilia_db_logger');
+            if ($this->params->has('acilia_db_logger')) {
+                $config =  $this->params->get('acilia_db_logger');
                 if (isset($config['pdo'])) {
                     if (!isset($config['pdo']['url']) || !isset($config['pdo']['user']) || !isset($config['pdo']['password'])) {
-                        throw new Exception('pdo configuration missing or not completed, (url, user and password must be set).');
+                        throw new \Exception('pdo configuration missing or not completed, (url, user and password must be set).');
                     } else {
                         $usePdo = true;
                     }
                 }
             }
-        
+
             if ($usePdo) {
-                $config =  $this->getContainer()->getParameter('acilia_db_logger');
+                $config =  $this->params->get('acilia_db_logger');
                 $options = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
                 $this->connection = new \PDO($config['pdo']['url'], $config['pdo']['user'], $config['pdo']['password'], $options);
             } else {
-                $this->connection = $this->getContainer()->get('doctrine')->getManager()->getConnection();
+                $this->connection = $this->em->getConnection();
             }
-        } 
+        }
 
         return $this->connection;
     }
@@ -73,22 +79,22 @@ class ArchiveCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $days = $input->getOption('days');
             $purge = $input->getOption('purge');
 
             if (!is_numeric($days)) {
-                throw new Exception('Days is not a valid number');
+                throw new \Exception('Days is not a valid number');
             }
 
             if ($days > $purge) {
-                throw new Exception(sprintf('Purge days (%s) must be greater than Archive days (%s)', $purge, $days));
+                throw new \Exception(sprintf('Purge days (%s) must be greater than Archive days (%s)', $purge, $days));
             }
 
             // Calculate now
-            $now = new DateTime();
+            $now = new \DateTime();
             $now->setTime(0, 0, 0);
             $now->modify('-' . $days . ' days');
 
@@ -110,7 +116,7 @@ class ArchiveCommand extends ContainerAwareCommand
             $output->writeln('OK');
 
             if (is_numeric($purge)) {
-                $now = new DateTime();
+                $now = new \DateTime();
                 $now->setTime(0, 0, 0);
                 $now->modify('-' . $purge . ' days');
 
@@ -122,10 +128,12 @@ class ArchiveCommand extends ContainerAwareCommand
                 $output->writeln('OK');
             }
 
-            return 0;
-        } catch (Exception $e) {
+            return self::SUCCESS;
+
+        } catch (\Exception $e) {
             $output->writeln(sprintf('ERROR: %s', $e->getMessage()));
-            return 1;
+
+            return self::ERROR;
         }
     }
 }
