@@ -13,9 +13,9 @@ class ArchiveCommand extends Command
 
     public const ARCHIVE_DAYS = 30;
 
-    protected \PDO $connection = null;
-    protected EntityManagerInterface $em;
-    protected ParameterBagInterface $params;
+    protected $connection = null;
+    protected $em;
+    protected $params;
 
     public function __construct(EntityManagerInterface $em, ParameterBagInterface $params)
     {

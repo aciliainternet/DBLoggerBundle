@@ -30,27 +30,27 @@ class Log
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private int $id;
+    private $id;
 
     /**
      * @ORM\Column(name="log_channel", type="string", length=255, nullable=true)
      */
-    private string $channel;
+    private $channel;
 
     /**
      * @ORM\Column(name="log_level", type="string", length=255, nullable=true)
      */
-    private string $level;
+    private $level;
 
     /**
      * @ORM\Column(name="log_message", type="text", nullable=true)
      */
-    private string $message;
+    private $message;
 
     /**
      * @ORM\Column(name="log_datetime", type="datetime", nullable=false)
      */
-    private \DateTimeInterface $datetime;
+    private $datetime;
 
     public function getId(): int
     {
